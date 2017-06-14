@@ -1,6 +1,6 @@
 package info.creepershift.daytime.server;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -9,17 +9,31 @@ import java.time.format.DateTimeFormatter;
  */
 public final class TimeHelper {
 
-    private TimeHelper(){}
-
-
-    public static String getCurrentTime(){
-
-        LocalDateTime date = LocalDateTime.now();
-
-        DateTimeFormatter dateFormat = DateTimeFormatter.ISO_DATE_TIME;
-
-        return date.format(dateFormat);
+    private TimeHelper() {
     }
 
+    private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("E, dd/MM/yyyy");
+    private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    /*
+    Returns the current time, date and timezone.
+     */
+    public static String getDate() {
+
+        ZonedDateTime date = ZonedDateTime.now();
+
+        return "Hello, it's " + date.format(dateFormat) + ". The time is " + date.format(timeFormat) +
+                ". Your timezone is " + date.format(DateTimeFormatter.ofPattern("VV, O."));
+    }
+
+    /*
+    Returns time for console
+     */
+    public static String getTime() {
+
+        ZonedDateTime date = ZonedDateTime.now();
+
+        return "[" + date.format(timeFormat) + "] ";
+    }
 
 }

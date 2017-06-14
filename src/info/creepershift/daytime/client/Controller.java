@@ -2,20 +2,17 @@ package info.creepershift.daytime.client;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,13 +29,21 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         responseField.setEditable(false);
+        btnSend.disableProperty().bind(Bindings.or(fieldIP.textProperty().isEmpty(), fieldPort.textProperty().isEmpty()));
 
-        BooleanBinding ipBinding = fieldIP.textProperty().isEmpty();
-        BooleanBinding portBinding = fieldPort.textProperty().isEmpty();
 
-        BooleanBinding combinedBinding = Bindings.or(ipBinding, portBinding);
+        /*
+        Too lazy to type this every time.....zZzzZzzzz
+         */
+        if (ClientMain.DEBUG) {
+            fieldIP.setText("localhost");
+            fieldPort.setText("6789");
+        }
 
-        btnSend.disableProperty().bind(combinedBinding);
+
+        /*
+        Setup our checkbox, defaults to UDP.
+         */
         ArrayList<String> cnts = new ArrayList<>();
         cnts.add("UDP");
         cnts.add("TCP");
@@ -54,6 +59,12 @@ public class Controller implements Initializable {
 
     public void onSend(ActionEvent actionEvent) {
 
+        try {
+            Integer.parseInt(fieldPort.getText());
+        } catch (Exception e) {
+            displayError("Number Format Error", "Port can only contain numbers!");
+            return;
+        }
 
         if (connectionBox.getValue().toString().equalsIgnoreCase("tcp")) {
             sendTCP();
@@ -105,8 +116,20 @@ public class Controller implements Initializable {
             responseField.setText(inFromServer.readLine());
 
             clientSocket.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ConnectException ce) {
+            displayError("Connection Exception", "Could not connect to the server. Server might be offline or the connection was refused remotely.");
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
         }
     }
+
+
+    private void displayError(String header, String error) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Error");
+        alert.setHeaderText(header);
+        alert.setContentText(error);
+        alert.showAndWait();
     }
+
+}

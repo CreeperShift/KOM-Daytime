@@ -9,14 +9,14 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="211.0" prefWidth="469.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="info.creepershift.daytime.client.Controller">
    <children>
-      <Label layoutX="230.0" layoutY="126.0" text="Server Response" textAlignment="CENTER" />
-      <TextArea fx:id="responseField" layoutX="230.0" layoutY="143.0" prefHeight="61.0" prefWidth="232.0" />
-      <Button fx:id="btnEXIT" cancelButton="true" layoutX="15.0" layoutY="148.0" mnemonicParsing="false" onAction="#onQuit" prefHeight="50.0" prefWidth="69.0" text="Quit" />
-      <Button fx:id="btnSend" layoutX="366.0" layoutY="16.0" mnemonicParsing="false" onAction="#onSend" text="Request" />
-      <TextField fx:id="fieldIP" layoutX="29.0" layoutY="17.0" prefHeight="25.0" prefWidth="88.0" />
-      <TextField fx:id="fieldPort" layoutX="166.0" layoutY="17.0" prefHeight="25.0" prefWidth="59.0" />
-      <Label layoutX="9.0" layoutY="21.0" text="IP:" />
-      <Label layoutX="127.0" layoutY="21.0" text="Port:" />
-      <ChoiceBox fx:id="connectionBox" layoutX="236.0" layoutY="16.0" prefHeight="31.0" prefWidth="69.0" />
+      <Label layoutX="181.0" layoutY="127.0" text="Server Response" textAlignment="CENTER" />
+      <TextArea fx:id="responseField" layoutX="119.0" layoutY="144.0" prefHeight="61.0" prefWidth="232.0" wrapText="true" />
+      <Button fx:id="btnEXIT" cancelButton="true" layoutX="386.0" layoutY="149.0" mnemonicParsing="false" onAction="#onQuit" prefHeight="50.0" prefWidth="69.0" text="Quit" />
+      <TextField fx:id="fieldIP" layoutX="75.0" layoutY="17.0" prefHeight="25.0" prefWidth="88.0" />
+      <TextField fx:id="fieldPort" layoutX="248.0" layoutY="17.0" prefHeight="25.0" prefWidth="59.0" />
+      <Label layoutX="52.0" layoutY="21.0" text="IP:" />
+      <Label layoutX="213.0" layoutY="21.0" text="Port:" />
+      <ChoiceBox fx:id="connectionBox" layoutX="352.0" layoutY="14.0" prefHeight="31.0" prefWidth="69.0" />
+      <Button fx:id="btnSend" cancelButton="true" layoutX="16.0" layoutY="149.0" mnemonicParsing="false" onAction="#onSend" prefHeight="50.0" prefWidth="69.0" text="Request" />
    </children>
 </AnchorPane>

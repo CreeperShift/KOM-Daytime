@@ -12,7 +12,7 @@ import java.net.Socket;
  * Daytime
  * Created by Max on 6/7/2017.
  */
-public class TCPConnection implements Connection {
+public class TCPConnection extends Thread implements Connection {
 
 
     @Override
@@ -29,7 +29,7 @@ public class TCPConnection implements Connection {
             BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             if(inFromClient.readLine().equals("ACK")){
-                outToClient.writeBytes(TimeHelper.getCurrentTime());
+                outToClient.writeBytes(TimeHelper.getDate());
             }
 
             if(inFromClient.readLine().equals("ACK")){
