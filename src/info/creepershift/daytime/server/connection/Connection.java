@@ -1,5 +1,6 @@
 package info.creepershift.daytime.server.connection;
 
+import java.io.IOException;
 import java.net.Socket;
 
 /**
@@ -8,6 +9,6 @@ import java.net.Socket;
  */
 public interface Connection {
 
-    void connect(Socket socket);
+    void connect(Socket socket) throws IOException;
 
 }

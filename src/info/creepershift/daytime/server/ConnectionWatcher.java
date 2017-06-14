@@ -27,29 +27,31 @@ public class ConnectionWatcher extends Thread {
     @Override
     public void run() {
 
-        try {
-            Socket connectionSocket = serverSocket.accept();
-            BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+        //noinspection InfiniteLoopStatement
+        while(true) {
+            try {
+                Socket connectionSocket = serverSocket.accept();
+                BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
-            String message = inFromClient.readLine();
+                String message = inFromClient.readLine();
 
-            if (message.equals("SYN")) {
+                if (message.equals("SYN")) {
 
-                Connection con = connectionFactory.getConnection("tcp");
-                con.connect(connectionSocket);
+                    Connection con = connectionFactory.getConnection("tcp");
+                    con.connect(connectionSocket);
+                }
+                if (message.isEmpty()) {
+                    Connection con = connectionFactory.getConnection("udp");
+                    con.connect(connectionSocket);
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            if(message.isEmpty()){
-                Connection con = connectionFactory.getConnection("udp");
-                con.connect(connectionSocket);
-            }
 
+            System.out.println("Thread ran");
 
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-
     }
 }

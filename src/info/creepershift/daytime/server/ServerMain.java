@@ -12,7 +12,7 @@ public class ServerMain {
 
 
         try {
-            Thread thread = new Thread(new ConnectionWatcher());
+            ConnectionWatcher thread = new ConnectionWatcher();
             thread.start();
         } catch (IOException e) {
             e.printStackTrace();
