@@ -1,5 +1,6 @@
 package info.creepershift.daytime.client;
 
+import info.creepershift.daytime.common.Logger;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -28,6 +29,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Logger.info("Client starting up. Debug mode is " + (ClientMain.DEBUG ? "enabled." : "disabled."));
         responseField.setEditable(false);
         btnSend.disableProperty().bind(Bindings.or(fieldIP.textProperty().isEmpty(), fieldPort.textProperty().isEmpty()));
 
@@ -67,8 +69,10 @@ public class Controller implements Initializable {
         }
 
         if (connectionBox.getValue().toString().equalsIgnoreCase("tcp")) {
+            Logger.info("Starting TCP request.");
             sendTCP();
         } else {
+            Logger.info("Starting UDP request.");
             sendUDP();
         }
     }
@@ -108,12 +112,15 @@ public class Controller implements Initializable {
         try {
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
 
+            Logger.info("Socket created successfully.");
+
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             outToServer.writeByte('\n');
 
             responseField.setText(inFromServer.readLine());
+            Logger.info("Received Date and Time, closing Socket.");
 
             clientSocket.close();
         } catch (ConnectException ce) {
@@ -125,6 +132,7 @@ public class Controller implements Initializable {
 
 
     private void displayError(String header, String error) {
+        Logger.error(header + ": " + error);
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Error");
         alert.setHeaderText(header);

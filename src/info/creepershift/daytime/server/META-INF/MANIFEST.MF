@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: info.creepershift.daytime.server
+Main-Class: info.creepershift.daytime.server.ServerMain
+
