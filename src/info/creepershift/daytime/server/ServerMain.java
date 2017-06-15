@@ -32,8 +32,7 @@ public class ServerMain extends Application {
         }
 
         try {
-            ConnectionWatcher thread = new ConnectionWatcher(port);
-            thread.start();
+            new ConnectionWatcher(port);
             Logger log = new Logger(false);
             log.start();
         } catch (IOException e) {

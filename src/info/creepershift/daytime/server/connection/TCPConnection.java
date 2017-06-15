@@ -1,5 +1,6 @@
 package info.creepershift.daytime.server.connection;
 
+import info.creepershift.daytime.common.Logger;
 import info.creepershift.daytime.server.TimeHelper;
 
 import java.io.BufferedReader;
@@ -18,10 +19,12 @@ public class TCPConnection extends Thread implements Connection {
     @Override
     public void connect(Socket socket) {
 
-        System.out.println("Connection open");
+        Logger.info("TCPConnection Thread created.");
 
         try {
             DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
+
+            //TODO: IMPLEMENT TCP BELOW
 
             outToClient.writeBytes("SYN,ACK");
             System.out.println("SENDING SYN & ACK");
@@ -44,6 +47,7 @@ public class TCPConnection extends Thread implements Connection {
             socket.close();
 
         } catch (IOException e) {
+            Logger.error("Something went wrong.");
             e.printStackTrace();
         }
     }

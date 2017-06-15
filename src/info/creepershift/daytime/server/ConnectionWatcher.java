@@ -14,19 +14,14 @@ import java.net.Socket;
  * Daytime
  * Created by Max on 6/7/2017.
  * <p>
- * ConnectionWatcher is a separate thread that waits for an incoming connection.
+ * ConnectionWatcher waits for an incoming connection.
  * Once the connection is established, it gets handed off into the corresponding Connection type.
  */
 
-public class ConnectionWatcher extends Thread {
+public class ConnectionWatcher {
 
-    /*
-    Holds our port and server side socket.
-     */
-    private int port;
     private boolean running = true;
     private ServerSocket serverSocket;
-    private BufferedReader inFromClient;
     private static ConnectionWatcher INSTANCE;
 
     /*
@@ -37,14 +32,14 @@ public class ConnectionWatcher extends Thread {
 
     public ConnectionWatcher(int port) throws IOException {
         INSTANCE = this;
-        this.port = port;
         serverSocket = new ServerSocket(port);
         Logger.info("Initializing server on port " + port + ".");
+        startServer();
     }
 
 
-    @Override
-    public void run() {
+
+    private void startServer() {
         Logger.info("Server start successful.");
 
         while (running) {
@@ -53,7 +48,7 @@ public class ConnectionWatcher extends Thread {
                 Hurray, we got a connection!
                  */
                 Socket connectionSocket = serverSocket.accept();
-                inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
                 /*
                 Read the first packet.

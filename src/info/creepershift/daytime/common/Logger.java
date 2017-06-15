@@ -50,7 +50,6 @@ public class Logger extends Thread {
 
         if (command.length > 0) switch (command[0]) {
             case "stop":
-                //fallthrough
             case "STOP":
                 if (!client) {
                     info("Stopping server.");

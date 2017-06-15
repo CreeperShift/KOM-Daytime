@@ -24,7 +24,7 @@ public class Controller implements Initializable {
     public Button btnEXIT;
     public TextField fieldIP;
     public TextField fieldPort;
-    public ChoiceBox connectionBox;
+    public ChoiceBox<String> connectionBox;
     public Button btnSend;
 
     @Override
@@ -59,8 +59,12 @@ public class Controller implements Initializable {
         Platform.exit();
     }
 
+
     public void onSend(ActionEvent actionEvent) {
 
+        /*
+        We check if the port field contains anything but numbers.
+         */
         try {
             Integer.parseInt(fieldPort.getText());
         } catch (Exception e) {
@@ -68,7 +72,7 @@ public class Controller implements Initializable {
             return;
         }
 
-        if (connectionBox.getValue().toString().equalsIgnoreCase("tcp")) {
+        if (connectionBox.getValue().equalsIgnoreCase("tcp")) {
             Logger.info("Starting TCP request.");
             sendTCP();
         } else {
@@ -78,8 +82,12 @@ public class Controller implements Initializable {
     }
 
 
+    /*
+    Sends our request via TCP.
+     */
     private void sendTCP() {
 
+        //TODO: IMPLEMENT TCP
         try {
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
 
@@ -103,20 +111,27 @@ public class Controller implements Initializable {
             clientSocket.close();
 
         } catch (IOException e) {
+            displayError("Error", "Something went wrong.");
             e.printStackTrace();
         }
 
     }
 
+    /*
+    Sends our request via UDP.
+     */
     private void sendUDP() {
         try {
-            Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
 
+            Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
             Logger.info("Socket created successfully.");
 
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
+            /*
+            We send an empty packet.
+             */
             outToServer.writeByte('\n');
 
             responseField.setText(inFromServer.readLine());
@@ -126,11 +141,16 @@ public class Controller implements Initializable {
         } catch (ConnectException ce) {
             displayError("Connection Exception", "Could not connect to the server. Server might be offline or the connection was refused remotely.");
         } catch (IOException ioException) {
+            displayError("Connection Reset", "The server reset the connection.");
             ioException.printStackTrace();
         }
     }
 
 
+    /*
+    Error handling.
+    Pass in a header and the error description.
+     */
     private void displayError(String header, String error) {
         Logger.error(header + ": " + error);
         Alert alert = new Alert(Alert.AlertType.WARNING);
