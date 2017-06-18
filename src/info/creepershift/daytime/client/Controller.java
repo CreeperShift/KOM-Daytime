@@ -87,17 +87,17 @@ public class Controller implements Initializable {
      */
     private void sendTCP() {
 
-        //TODO: IMPLEMENT TCP
+        //TODO: CLEANUP
         try {
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
+            Logger.info("Socket created successfully.");
 
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             outToServer.writeBytes("SYN" + '\n');
-
             if (inFromServer.readLine().equals("SYN,ACK")) {
-                outToServer.writeBytes("ACK" + '\n');
+                outToServer.writeBytes("ACK\n");
             }
 
             responseField.setText(inFromServer.readLine());
@@ -108,7 +108,11 @@ public class Controller implements Initializable {
                 outToServer.writeBytes("ACK" + '\n' + "FIN" + '\n');
             }
 
-            clientSocket.close();
+            if (inFromServer.readLine().equalsIgnoreCase("ACK")) {
+                clientSocket.close();
+            }
+
+            Logger.info("Received Date and Time, closing Socket.");
 
         } catch (IOException e) {
             displayError("Error", "Something went wrong.");

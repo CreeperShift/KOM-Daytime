@@ -16,39 +16,45 @@ import java.net.Socket;
 public class TCPConnection extends Thread implements Connection {
 
 
+    private Socket socket;
+
     @Override
-    public void connect(Socket socket) {
+    public void connect(Socket socket) throws IOException {
+        Thread thread = new Thread(this);
+        this.socket = socket;
+        thread.start();
+    }
 
+    @Override
+    public void run() {
         Logger.info("TCPConnection Thread created.");
-
         try {
             DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
-
-            //TODO: IMPLEMENT TCP BELOW
-
-            outToClient.writeBytes("SYN,ACK");
-            System.out.println("SENDING SYN & ACK");
-
             BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            if(inFromClient.readLine().equals("ACK")){
-                outToClient.writeBytes(TimeHelper.getDate());
+            outToClient.writeBytes("SYN,ACK" + '\n');
+
+            if (inFromClient.readLine().equalsIgnoreCase("ACK")) {
+                outToClient.writeBytes(TimeHelper.getDate() + '\n');
+            }
+            if (inFromClient.readLine().equalsIgnoreCase("ACK")) {
+                outToClient.writeBytes("FIN\n");
             }
 
-            if(inFromClient.readLine().equals("ACK")){
-                outToClient.writeBytes("FIN");
-            }
-
-            if(inFromClient.readLine().equals("ACK") && inFromClient.readLine().equals("FIN")){
+            if (inFromClient.readLine().equalsIgnoreCase("ACK") && inFromClient.readLine().equalsIgnoreCase("FIN")) {
                 outToClient.writeBytes("ACK");
-
             }
-
             socket.close();
+            inFromClient.close();
+            outToClient.close();
+            Logger.info("Date and Time sent, closing connection.");
 
-        } catch (IOException e) {
+        } catch (IOException e)
+
+        {
             Logger.error("Something went wrong.");
             e.printStackTrace();
         }
     }
+
 }
