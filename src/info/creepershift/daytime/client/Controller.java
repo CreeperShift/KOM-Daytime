@@ -26,6 +26,8 @@ public class Controller implements Initializable {
     public TextField fieldPort;
     public ChoiceBox<String> connectionBox;
     public Button btnSend;
+    public TextField fieldRetrys;
+    private int retries;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -52,6 +54,7 @@ public class Controller implements Initializable {
         ObservableList<String> obsList = FXCollections.observableList(cnts);
         connectionBox.setItems(obsList);
         connectionBox.setValue("UDP");
+        fieldRetrys.setText("3");
 
     }
 
@@ -67,8 +70,9 @@ public class Controller implements Initializable {
          */
         try {
             Integer.parseInt(fieldPort.getText());
+            retries = Integer.parseInt(fieldRetrys.getText());
         } catch (Exception e) {
-            displayError("Number Format Error", "Port can only contain numbers!");
+            displayError("Number Format Error", "Port and Retrys can only contain numbers!");
             return;
         }
 
@@ -87,17 +91,18 @@ public class Controller implements Initializable {
      */
     private void sendTCP() {
 
-        //TODO: IMPLEMENT TCP
+        //TODO: CLEANUP
         try {
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
+            clientSocket.setSoTimeout(5000);
+            Logger.info("Socket created successfully.");
 
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             outToServer.writeBytes("SYN" + '\n');
-
             if (inFromServer.readLine().equals("SYN,ACK")) {
-                outToServer.writeBytes("ACK" + '\n');
+                outToServer.writeBytes("ACK\n");
             }
 
             responseField.setText(inFromServer.readLine());
@@ -108,11 +113,19 @@ public class Controller implements Initializable {
                 outToServer.writeBytes("ACK" + '\n' + "FIN" + '\n');
             }
 
-            clientSocket.close();
+            if (inFromServer.readLine().equalsIgnoreCase("ACK")) {
+                clientSocket.close();
+            }
+
+            Logger.info("Received Date and Time, closing Socket.");
 
         } catch (IOException e) {
             displayError("Error", "Something went wrong.");
             e.printStackTrace();
+            if(retries > 0){
+                retries--;
+                sendTCP();
+            }
         }
 
     }
@@ -124,6 +137,7 @@ public class Controller implements Initializable {
         try {
 
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
+            clientSocket.setSoTimeout(5000);
             Logger.info("Socket created successfully.");
 
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -140,9 +154,17 @@ public class Controller implements Initializable {
             clientSocket.close();
         } catch (ConnectException ce) {
             displayError("Connection Exception", "Could not connect to the server. Server might be offline or the connection was refused remotely.");
+            if(retries > 0){
+                retries--;
+                sendUDP();
+            }
         } catch (IOException ioException) {
             displayError("Connection Reset", "The server reset the connection.");
             ioException.printStackTrace();
+            if(retries > 0){
+                retries--;
+                sendUDP();
+            }
         }
     }
 

@@ -38,7 +38,6 @@ public class ConnectionWatcher {
     }
 
 
-
     private void startServer() {
         Logger.info("Server start successful.");
 
@@ -48,6 +47,7 @@ public class ConnectionWatcher {
                 Hurray, we got a connection!
                  */
                 Socket connectionSocket = serverSocket.accept();
+                connectionSocket.setSoTimeout(5000);
                 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
                 /*
@@ -91,7 +91,7 @@ public class ConnectionWatcher {
     /*
     Stops our thread, closes the socket.
      */
-    public static void stopWatcher(){
+    public static void stopWatcher() {
         INSTANCE.running = false;
         try {
             INSTANCE.serverSocket.close();
