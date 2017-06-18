@@ -123,8 +123,8 @@ public class Controller implements Initializable {
             displayError("Error", "Something went wrong.");
             e.printStackTrace();
             if(retries > 0){
-                sendTCP();
                 retries--;
+                sendTCP();
             }
         }
 
@@ -155,15 +155,15 @@ public class Controller implements Initializable {
         } catch (ConnectException ce) {
             displayError("Connection Exception", "Could not connect to the server. Server might be offline or the connection was refused remotely.");
             if(retries > 0){
-                sendUDP();
                 retries--;
+                sendUDP();
             }
         } catch (IOException ioException) {
             displayError("Connection Reset", "The server reset the connection.");
             ioException.printStackTrace();
             if(retries > 0){
-                sendUDP();
                 retries--;
+                sendUDP();
             }
         }
     }

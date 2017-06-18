@@ -12,7 +12,7 @@ import javafx.stage.Stage;
  */
 public class ClientMain extends Application {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
