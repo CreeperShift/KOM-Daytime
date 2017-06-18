@@ -47,7 +47,7 @@ public class ConnectionWatcher {
                 Hurray, we got a connection!
                  */
                 Socket connectionSocket = serverSocket.accept();
-                connectionSocket.setSoTimeout(5000);
+                connectionSocket.setSoTimeout(25000);
                 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
                 /*

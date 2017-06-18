@@ -94,7 +94,7 @@ public class Controller implements Initializable {
         //TODO: CLEANUP
         try {
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
-            clientSocket.setSoTimeout(5000);
+            clientSocket.setSoTimeout(25000);
             Logger.info("Socket created successfully.");
 
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -137,7 +137,7 @@ public class Controller implements Initializable {
         try {
 
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
-            clientSocket.setSoTimeout(5000);
+            clientSocket.setSoTimeout(25000);
             Logger.info("Socket created successfully.");
 
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
