@@ -13,15 +13,13 @@ import java.net.Socket;
  * Daytime
  * Created by Max on 6/7/2017.
  */
-public class TCPConnection extends Thread implements Connection {
-
+public class TCPConnection implements Runnable {
 
     private Socket socket;
 
-    @Override
-    public void connect(Socket socket) throws IOException {
+    public void connect(Object socket) throws IOException {
         Thread thread = new Thread(this);
-        this.socket = socket;
+        this.socket = (Socket) socket;
         thread.start();
     }
 

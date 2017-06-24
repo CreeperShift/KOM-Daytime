@@ -1,6 +1,6 @@
 package info.creepershift.daytime.common;
 
-import info.creepershift.daytime.server.ConnectionWatcher;
+import info.creepershift.daytime.server.ConnectionWatcherTCP;
 import info.creepershift.daytime.server.TimeHelper;
 import javafx.application.Platform;
 
@@ -53,7 +53,7 @@ public class Logger extends Thread {
             case "STOP":
                 if (!client) {
                     info("Stopping server.");
-                    ConnectionWatcher.stopWatcher();
+                    ConnectionWatcherTCP.stopWatcher();
                     thread = null;
                 }
                 Platform.exit();
