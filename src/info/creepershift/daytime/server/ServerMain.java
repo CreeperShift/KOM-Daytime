@@ -33,6 +33,7 @@ public class ServerMain extends Application {
 
         try {
             new ConnectionWatcherTCP(port);
+            new ConnectionWatcherUDP(port);
             Logger log = new Logger(false);
             log.start();
         } catch (IOException e) {
