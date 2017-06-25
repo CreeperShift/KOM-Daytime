@@ -70,7 +70,7 @@ public class Controller implements Initializable {
             Integer.parseInt(fieldPort.getText());
             retries = Integer.parseInt(fieldRetrys.getText());
         } catch (Exception e) {
-            displayError("Number Format Error", "Port and Retrys can only contain numbers!");
+            displayError("Number Format Error", "Port and Retries can only contain numbers!");
             return;
         }
 
@@ -88,9 +88,8 @@ public class Controller implements Initializable {
     Sends our request via TCP.
      */
     private void sendTCP() {
-
-        //TODO: CLEANUP
         try {
+
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
             clientSocket.setSoTimeout(5000);
             Logger.info("Socket created successfully.");
