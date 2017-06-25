@@ -13,9 +13,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -72,7 +70,7 @@ public class Controller implements Initializable {
             Integer.parseInt(fieldPort.getText());
             retries = Integer.parseInt(fieldRetrys.getText());
         } catch (Exception e) {
-            displayError("Number Format Error", "Port and Retrys can only contain numbers!");
+            displayError("Number Format Error", "Port and Retries can only contain numbers!");
             return;
         }
 
@@ -90,9 +88,8 @@ public class Controller implements Initializable {
     Sends our request via TCP.
      */
     private void sendTCP() {
-
-        //TODO: CLEANUP
         try {
+
             Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
             clientSocket.setSoTimeout(5000);
             Logger.info("Socket created successfully.");
@@ -122,7 +119,7 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             displayError("Error", "Something went wrong.");
             e.printStackTrace();
-            if(retries > 0){
+            if (retries > 0) {
                 retries--;
                 sendTCP();
             }
@@ -130,42 +127,35 @@ public class Controller implements Initializable {
 
     }
 
-    /*
-    Sends our request via UDP.
-     */
     private void sendUDP() {
         try {
 
-            Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
-            clientSocket.setSoTimeout(5000);
+            DatagramSocket clientSocket = new DatagramSocket();
             Logger.info("Socket created successfully.");
+            byte[] buf = new byte[256];
+            InetAddress address = InetAddress.getByName(fieldIP.getText());
 
-            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(fieldPort.getText()));
+            clientSocket.send(packet);
+            Logger.info("Packet sent.");
 
-            /*
-            We send an empty packet.
-             */
-            outToServer.writeByte('\n');
-
-            responseField.setText(inFromServer.readLine());
+            packet = new DatagramPacket(buf, buf.length);
+            clientSocket.receive(packet);
+            Logger.info("Received packet.");
+            String received = new String(packet.getData(), 0, packet.getLength());
+            responseField.setText(received);
             Logger.info("Received Date and Time, closing Socket.");
-
             clientSocket.close();
-        } catch (ConnectException ce) {
-            displayError("Connection Exception", "Could not connect to the server. Server might be offline or the connection was refused remotely.");
-            if(retries > 0){
-                retries--;
-                sendUDP();
-            }
-        } catch (IOException ioException) {
-            displayError("Connection Reset", "The server reset the connection.");
-            ioException.printStackTrace();
-            if(retries > 0){
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            if (retries > 0) {
                 retries--;
                 sendUDP();
             }
         }
+
+
     }
 
 
