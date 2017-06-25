@@ -16,9 +16,8 @@ import java.net.Socket;
 public class TCPConnection implements Runnable {
 
     private Socket socket;
-    private long timeout = 0;
-    BufferedReader inFromClient;
-    DataOutputStream outToClient;
+    private BufferedReader inFromClient;
+    private DataOutputStream outToClient;
 
     public TCPConnection(Socket sock) throws IOException {
         socket = sock;
@@ -30,21 +29,21 @@ public class TCPConnection implements Runnable {
     public void run() {
         Logger.info("TCPConnection Thread created.");
         try {
-
-
-            outToClient.writeBytes("SYN,ACK" + '\n');
-
+            if (inFromClient.readLine().equalsIgnoreCase("SYN")) {
+                outToClient.writeBytes("SYN,ACK" + '\n');
+            }
             checkTimeout();
 
             if (inFromClient.readLine().equalsIgnoreCase("ACK")) {
                 outToClient.writeBytes(TimeHelper.getDate() + '\n');
-                checkTimeout();
             }
+            checkTimeout();
 
             if (inFromClient.readLine().equalsIgnoreCase("ACK")) {
                 outToClient.writeBytes("FIN\n");
             }
             checkTimeout();
+
             if (inFromClient.readLine().equalsIgnoreCase("ACK") && inFromClient.readLine().equalsIgnoreCase("FIN")) {
                 outToClient.writeBytes("ACK");
             }
@@ -62,8 +61,8 @@ public class TCPConnection implements Runnable {
         }
     }
 
-    private boolean checkTimeout() throws IOException, InterruptedException {
-        timeout = System.currentTimeMillis();
+    private void checkTimeout() throws IOException, InterruptedException {
+        long timeout = System.currentTimeMillis();
         while (!inFromClient.ready() && System.currentTimeMillis() < timeout + 8000) {
             Thread.sleep(50);
         }
@@ -71,7 +70,6 @@ public class TCPConnection implements Runnable {
             System.out.println("Failed at packet timeout check");
             throw new IOException();
         }
-        return true;
     }
 
 }

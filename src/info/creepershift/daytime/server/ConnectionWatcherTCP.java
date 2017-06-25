@@ -3,9 +3,7 @@ package info.creepershift.daytime.server;
 import info.creepershift.daytime.common.Logger;
 import info.creepershift.daytime.server.connection.TCPConnection;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -55,28 +53,9 @@ public class ConnectionWatcherTCP implements Runnable {
                  */
                 Socket connectionSocket = serverSocket.accept();
                 connectionSocket.setSoTimeout(5000);
-                BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
-                /*
-                Read the first packet.
-                 */
-                String message = inFromClient.readLine();
+                new Thread(new TCPConnection(connectionSocket)).start();
 
-                /*
-                If the packet is both empty and NOT SYN, we are dealing with something unsupported. We abort.
-                 */
-                if (!message.equals("SYN")) {
-                    Logger.error("Connection failed, not supported.");
-                    continue;
-                }
-
-                /*
-                If our packet contains SYN, we know it is TCP and launch the corresponding connection type.
-                 */
-                if (message.equals("SYN")) {
-                    Logger.info("Connected with " + connectionSocket.getInetAddress() + " on port " + connectionSocket.getPort() + ". Using TCP.");
-                    new Thread(new TCPConnection(connectionSocket)).start();
-                }
             } catch (IOException e) {
                 Logger.error("Socket timed out.");
                 e.printStackTrace();
