@@ -29,23 +29,18 @@ public class TCPConnection implements Runnable {
     public void run() {
         Logger.info("TCPConnection Thread created.");
         try {
-            if (inFromClient.readLine().equalsIgnoreCase("SYN")) {
-                outToClient.writeBytes("SYN,ACK" + '\n');
-            }
+            sendPackets("SYN", "SYN,ACK");
             checkTimeout();
 
-            if (inFromClient.readLine().equalsIgnoreCase("ACK")) {
-                outToClient.writeBytes(TimeHelper.getDate() + '\n');
-            }
+            sendPackets("ACK", TimeHelper.getDate());
             checkTimeout();
 
-            if (inFromClient.readLine().equalsIgnoreCase("ACK")) {
-                outToClient.writeBytes("FIN\n");
-            }
+            sendPackets("ACK", "FIN");
             checkTimeout();
 
             if (inFromClient.readLine().equalsIgnoreCase("ACK") && inFromClient.readLine().equalsIgnoreCase("FIN")) {
-                outToClient.writeBytes("ACK");
+                outToClient.writeBytes("ACK"+ '\n');
+                outToClient.flush();
             }
             socket.close();
             inFromClient.close();
@@ -69,6 +64,12 @@ public class TCPConnection implements Runnable {
         if (!inFromClient.ready()) {
             System.out.println("Failed at packet timeout check");
             throw new IOException();
+        }
+    }
+
+    private void sendPackets(String in, String out) throws IOException {
+        if (inFromClient.readLine().equalsIgnoreCase(in)) {
+            outToClient.writeBytes(out + '\n');
         }
     }
 
