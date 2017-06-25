@@ -75,10 +75,8 @@ public class ConnectionWatcherTCP implements Runnable {
                  */
                 if (message.equals("SYN")) {
                     Logger.info("Connected with " + connectionSocket.getInetAddress() + " on port " + connectionSocket.getPort() + ". Using TCP.");
-                    TCPConnection con = new TCPConnection();
-                    con.connect(connectionSocket);
+                    new Thread(new TCPConnection(connectionSocket)).start();
                 }
-
             } catch (IOException e) {
                 Logger.error("Socket timed out.");
                 e.printStackTrace();

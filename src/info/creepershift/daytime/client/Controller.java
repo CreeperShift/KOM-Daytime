@@ -128,44 +128,6 @@ public class Controller implements Initializable {
 
     }
 
-    /*
-    Sends our request via UDP.
-     */
-//    private void sendUDP() {
-//        try {
-//
-//            Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
-//            clientSocket.setSoTimeout(5000);
-//            Logger.info("Socket created successfully.");
-//
-//            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-//            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//
-//            /*
-//            We send an empty packet.
-//             */
-//            outToServer.writeByte('\n');
-//
-//            responseField.setText(inFromServer.readLine());
-//            Logger.info("Received Date and Time, closing Socket.");
-//
-//            clientSocket.close();
-//        } catch (ConnectException ce) {
-//            displayError("Connection Exception", "Could not connect to the server. Server might be offline or the connection was refused remotely.");
-//            if(retries > 0){
-//                retries--;
-//                sendUDP();
-//            }
-//        } catch (IOException ioException) {
-//            displayError("Connection Reset", "The server reset the connection.");
-//            ioException.printStackTrace();
-//            if(retries > 0){
-//                retries--;
-//                sendUDP();
-//            }
-//        }
-//    }
-
     private void sendUDP() {
         try {
 

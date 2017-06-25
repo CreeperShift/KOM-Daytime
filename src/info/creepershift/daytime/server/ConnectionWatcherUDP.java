@@ -51,12 +51,12 @@ public class ConnectionWatcherUDP implements Runnable {
                  */
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 serverSocket.receive(packet);
-                Logger.info("Received UDP Packet.");
                 String time = TimeHelper.getDate();
                 buf = time.getBytes();
 
                 InetAddress address = packet.getAddress();
                 int port = packet.getPort();
+                Logger.info("Received UDP Packet from " + address + " on port " + port + ".");
 
                 packet = new DatagramPacket(buf, buf.length, address, port);
                 serverSocket.send(packet);
