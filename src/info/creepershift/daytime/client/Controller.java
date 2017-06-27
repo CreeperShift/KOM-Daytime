@@ -10,7 +10,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
@@ -88,36 +87,29 @@ public class Controller implements Initializable {
     Sends our request via TCP.
      */
     private void sendTCP() {
+        Socket clientSocket = null;
         try {
 
-            Socket clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
+            clientSocket = new Socket(fieldIP.getText(), Integer.parseInt(fieldPort.getText()));
             clientSocket.setSoTimeout(5000);
-            Logger.info("Socket created successfully.");
-
-            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-            outToServer.writeBytes("SYN" + '\n');
-            if (inFromServer.readLine().equals("SYN,ACK")) {
-                outToServer.writeBytes("ACK\n");
-            }
-
-            responseField.setText(inFromServer.readLine());
-
-            outToServer.writeBytes("ACK" + '\n');
-
-            if (inFromServer.readLine().equals("FIN")) {
-                outToServer.writeBytes("ACK" + '\n' + "FIN" + '\n');
-            }
-
-            if (inFromServer.readLine().equalsIgnoreCase("ACK")) {
-                clientSocket.close();
-            }
-
-            Logger.info("Received Date and Time, closing Socket.");
-
         } catch (IOException e) {
-            displayError("Error", "Something went wrong.");
+            displayError("Error", "Could not establish connection with the server.");
+            e.printStackTrace();
+            if (retries > 0) {
+                retries--;
+                sendTCP();
+            }
+        }
+
+        try {
+            Logger.info("Socket created successfully with " + clientSocket.getInetAddress() + " on port " + clientSocket.getPort() + ".");
+            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            responseField.setText(inFromServer.readLine());
+            clientSocket.close();
+            inFromServer.close();
+            Logger.info("Received Date and Time, closing Socket.");
+        } catch (IOException e) {
+            displayError("Error", "Error during data receive.");
             e.printStackTrace();
             if (retries > 0) {
                 retries--;
@@ -128,17 +120,27 @@ public class Controller implements Initializable {
     }
 
     private void sendUDP() {
+        DatagramSocket clientSocket = null;
+        DatagramPacket packet = null;
+        byte[] buf = new byte[256];
+
         try {
-
-            DatagramSocket clientSocket = new DatagramSocket();
-            Logger.info("Socket created successfully.");
-            byte[] buf = new byte[256];
+            clientSocket = new DatagramSocket();
+            clientSocket.setSoTimeout(5000);
             InetAddress address = InetAddress.getByName(fieldIP.getText());
-
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(fieldPort.getText()));
+            packet = new DatagramPacket(buf, buf.length, address, Integer.parseInt(fieldPort.getText()));
             clientSocket.send(packet);
-            Logger.info("Packet sent.");
+            Logger.info("Packet sent to " + packet.getAddress() + " on port " + packet.getPort() + ".");
+        } catch (IOException e) {
+            displayError("Connection Error", "Error happened trying to send packet. Possible timeout?");
+            e.printStackTrace();
+            if (retries > 0) {
+                retries--;
+                sendUDP();
+            }
+        }
 
+        try {
             packet = new DatagramPacket(buf, buf.length);
             clientSocket.receive(packet);
             Logger.info("Received packet.");
@@ -146,8 +148,8 @@ public class Controller implements Initializable {
             responseField.setText(received);
             Logger.info("Received Date and Time, closing Socket.");
             clientSocket.close();
-
         } catch (IOException e) {
+            displayError("Connection Error", "Error happened trying to receive packet.");
             e.printStackTrace();
             if (retries > 0) {
                 retries--;

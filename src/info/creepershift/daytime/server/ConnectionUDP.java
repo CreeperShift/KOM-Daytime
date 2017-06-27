@@ -11,21 +11,29 @@ import java.net.InetAddress;
  * Daytime
  * Created by Max on 6/7/2017.
  * <p>
- * ConnectionWatcherTCP waits for an incoming connection.
+ * ConnectionTCP waits for an incoming connection.
  * Once the connection is established, it gets handed off into the corresponding Connection type.
  */
 
-public class ConnectionWatcherUDP implements Runnable {
+public class ConnectionUDP implements Runnable {
 
     private boolean running = true;
     private DatagramSocket serverSocket;
-    private static ConnectionWatcherUDP INSTANCE;
+    private static ConnectionUDP INSTANCE;
 
-    public ConnectionWatcherUDP(int port) throws IOException {
+    public ConnectionUDP(int port) throws IOException {
         Thread thread = new Thread(this);
         INSTANCE = this;
         serverSocket = new DatagramSocket(port);
         Logger.info("Initializing UDP on port " + port + ".");
+        thread.start();
+    }
+
+    public ConnectionUDP(int port, String address) throws IOException {
+        Thread thread = new Thread(this);
+        INSTANCE = this;
+        serverSocket = new DatagramSocket(port, InetAddress.getByName(address));
+        Logger.info("Initializing UDP on port " + port + " bound to interface " + address + ".");
         thread.start();
     }
 

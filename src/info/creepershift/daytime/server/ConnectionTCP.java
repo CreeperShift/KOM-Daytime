@@ -1,9 +1,10 @@
 package info.creepershift.daytime.server;
 
 import info.creepershift.daytime.common.Logger;
-import info.creepershift.daytime.server.connection.TCPConnection;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -11,21 +12,29 @@ import java.net.Socket;
  * Daytime
  * Created by Max on 6/7/2017.
  * <p>
- * ConnectionWatcherTCP waits for an incoming connection.
+ * ConnectionTCP waits for an incoming connection.
  * Once the connection is established, it gets handed off into the corresponding Connection type.
  */
 
-public class ConnectionWatcherTCP implements Runnable {
+public class ConnectionTCP implements Runnable {
 
     private boolean running = true;
     private ServerSocket serverSocket;
-    private static ConnectionWatcherTCP INSTANCE;
+    private static ConnectionTCP INSTANCE;
 
-    public ConnectionWatcherTCP(int port) throws IOException {
+    public ConnectionTCP(int port) throws IOException {
         Thread thread = new Thread(this);
         INSTANCE = this;
         serverSocket = new ServerSocket(port);
         Logger.info("Initializing TCP on port " + port + ".");
+        thread.start();
+    }
+
+    public ConnectionTCP(int port, String address) throws IOException {
+        Thread thread = new Thread(this);
+        INSTANCE = this;
+        serverSocket = new ServerSocket(port, 0, InetAddress.getByName(address));
+        Logger.info("Initializing TCP on port " + port + " bound to interface " + address + ".");
         thread.start();
     }
 
@@ -52,9 +61,13 @@ public class ConnectionWatcherTCP implements Runnable {
                 Hurray, we got a connection!
                  */
                 Socket connectionSocket = serverSocket.accept();
+                Logger.info("TCP Connection from " + connectionSocket.getInetAddress() + " on port " + connectionSocket.getPort() + ".");
                 connectionSocket.setSoTimeout(5000);
-
-                new Thread(new TCPConnection(connectionSocket)).start();
+                DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+                outToClient.writeBytes(TimeHelper.getDate() + '\n');
+                connectionSocket.close();
+                outToClient.close();
+                Logger.info("Date and Time sent, closing connection.");
 
             } catch (IOException e) {
                 Logger.error("Socket timed out.");

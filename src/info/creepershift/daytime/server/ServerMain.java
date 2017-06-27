@@ -31,9 +31,26 @@ public class ServerMain extends Application {
             port = Integer.parseInt(result.get());
         }
 
+        TextInputDialog bind = new TextInputDialog();
+        bind.setTitle("Server Configuration");
+        bind.setHeaderText("Server Configuration");
+        bind.setContentText("Enter interface:");
+
+        String address = "";
+
+        Optional<String> resultBind = bind.showAndWait();
+        if (resultBind.isPresent()) {
+            address = resultBind.get();
+        }
+
         try {
-            new ConnectionWatcherTCP(port);
-            new ConnectionWatcherUDP(port);
+            if(address.isEmpty()) {
+                new ConnectionTCP(port);
+                new ConnectionUDP(port);
+            }else{
+                new ConnectionTCP(port, address);
+                new ConnectionUDP(port, address);
+            }
             Logger log = new Logger(false);
             log.start();
         } catch (IOException e) {
